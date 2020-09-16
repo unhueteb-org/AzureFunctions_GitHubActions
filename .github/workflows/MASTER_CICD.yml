@@ -1,6 +1,6 @@
 name: master branch CICD - PRoduction Function APP
 on:
-  pull_request:
+  push:
     branches: [ master ]
  
 
