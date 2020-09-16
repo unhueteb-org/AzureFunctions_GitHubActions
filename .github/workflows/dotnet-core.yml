@@ -1,7 +1,7 @@
 name: .NET Core 3.1 Function to Azure Function
 
 env:
-  AZURE_FUNCTIONAPP_NAME: GAchallengeUnai  # set this to your application's name
+  AZURE_FUNCTIONAPP_NAME: azurechallengeunai-fa  # set this to your application's name
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'    # set this to the path to your web app project, defaults to the repository root
  
 on:
