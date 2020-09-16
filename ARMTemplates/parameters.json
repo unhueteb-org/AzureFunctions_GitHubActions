@@ -3,16 +3,16 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "sites_GAchallengeUnai_name": {
-            "value": null
+            "value": "GAchallengeUnai"
         },
         "components_GAchallengeUnai_name": {
-            "value": null
+            "value": "GAchallengeUnai"
         },
         "storageAccounts_storageaccountazurea5d0_name": {
-            "value": null
+            "value": "storageaccountazurea5d0"
         },
         "serverfarms_ASP_AzureChallengeGitHubActionsRG4_bb14_name": {
-            "value": null
+            "value": "ASP-AzureChallengeGitHubActionsRG4-bb14"
         }
     }
 }
