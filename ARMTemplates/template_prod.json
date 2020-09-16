@@ -160,7 +160,7 @@
                         "hostType": "Repository"
                     }
                 ],
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_azurechallengeunai_fa_name'))]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
                 "reserved": false,
                 "isXenon": false,
                 "hyperV": false,
@@ -178,10 +178,10 @@
         {
             "type": "Microsoft.Web/sites/slots/config",
             "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('sites_azurechallengeunai_fa_name'), '/staging/web')]",
+            "name": "[concat(parameters('appName'), '/staging/web')]",
             "location": "North Europe",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites/slots', (parameters('appName'), 'staging')]",
+                "[resourceId('Microsoft.Web/sites/slots', variables('functionAppName'), 'staging')]",
                 "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]"
             ],
             "properties": {
@@ -261,10 +261,10 @@
         {
             "type": "Microsoft.Web/sites/slots/hostNameBindings",
             "apiVersion": "2018-11-01",
-            "name": "[concat(parameters('sites_azurechallengeunai_fa_name'), '/staging/', parameters('sites_azurechallengeunai_fa_name'), '-staging.azurewebsites.net')]",
+            "name": "[concat(variables('functionAppName'), '/staging/', variables('functionAppName'), '-staging.azurewebsites.net')]",
             "location": "North Europe",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/sites/slots', (parameters('appName'), 'staging')]",
+                "[resourceId('Microsoft.Web/sites/slots', variables('functionAppName'), 'staging')]",
                 "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]"
             ],
             "properties": {
