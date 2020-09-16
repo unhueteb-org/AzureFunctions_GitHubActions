@@ -50,10 +50,13 @@ jobs:
       AZURE_LOCATION: NorthEurope  # set this to your Location Name 
     
     steps:
-      - name: Extract branch name
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-        id: extract_branch
+      
+      - name: Step that prints name of pull request's base branch
+        run: |
+          echo "Pull request's base branch is: ${BASE_BRANCH}"
+        env:
+          BASE_BRANCH: ${{ github.base_ref }}
+        if: github.event_name == 'pull_request'
         
        
         
@@ -81,7 +84,7 @@ jobs:
           # For details on usage of environment variables, please refer https://help.github.com/en/actions/configuring-and-managing-workflows/using-environment-variables
           # or specify these parameters inline.  Example:  az group create -l westus -n MyResourceGroup
 
-            az deployment group create --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --template-file $GITHUB_WORKSPACE/template.json  --parameters $GITHUB_WORKSPACE/parameters.json --parameters appName= azurechallengeunai-${{ steps.extract_branch.outputs.branch }}  --mode incremental 
+            az deployment group create --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --template-file $GITHUB_WORKSPACE/template.json  --parameters $GITHUB_WORKSPACE/parameters.json --parameters appName= azurechallengeunai-${{ BASE_BRANCH }}  --mode incremental 
 
          # For more details on above command refer https://docs.microsoft.com/en-us/cli/azure/group/deployment?view=azure-cli-latest#az-group-deployment-create       
 
