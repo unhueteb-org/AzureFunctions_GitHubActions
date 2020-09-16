@@ -58,7 +58,7 @@ jobs:
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: extract_branch
         
-        ${{ steps.extract_branch.outputs.branch }}
+       
         
           #Download ARM template artifatcts
       - uses: actions/download-artifact@v2
@@ -84,7 +84,7 @@ jobs:
           # For details on usage of environment variables, please refer https://help.github.com/en/actions/configuring-and-managing-workflows/using-environment-variables
           # or specify these parameters inline.  Example:  az group create -l westus -n MyResourceGroup
 
-            az deployment group create --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --template-file $GITHUB_WORKSPACE/template.json  --parameters $GITHUB_WORKSPACE/parameters.json  --mode incremental 
+            az deployment group create --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --template-file $GITHUB_WORKSPACE/template.json  --parameters $GITHUB_WORKSPACE/parameters.json --parameters appName= azurechallengeunai-${{ steps.extract_branch.outputs.branch }}  --mode incremental 
 
          # For more details on above command refer https://docs.microsoft.com/en-us/cli/azure/group/deployment?view=azure-cli-latest#az-group-deployment-create       
 
@@ -100,6 +100,11 @@ jobs:
       #AZURE_FUNCTIONAPP_NAME: azurechallengeunai-
     
     steps:
+    #extract branch name
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch
                 
     #Download ARM template artifatcts
     - uses: actions/download-artifact@v2
@@ -107,13 +112,8 @@ jobs:
         name: Function
         path: $GITHUB_WORKSPACE/Function
     
-    #- name: 'Checkout GitHub Action'
-     # uses: actions/checkout@master
-     - name: Extract branch name
-       shell: bash
-       run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-       id: extract_branch
-
+    
+     
 # Authentication
     # Set up the following secrets in your repository: AZURE_CREDENTIALS
     # For details on usage of secrets, please refer https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets
@@ -128,3 +128,9 @@ jobs:
       with:
         app-name: azurechallengeunai-${{ steps.extract_branch.outputs.branch }}                                                           
         package: $GITHUB_WORKSPACE/Function
+        
+    - name: Azure CLI Action
+      uses: Azure/cli@v1.0.0
+      with:
+        # Specify the script here
+        inlineScript: az functionapp delete --name azurechallengeunai-${{ steps.extract_branch.outputs.branch }}   --resource-group ${{ env.AZURE_RESOURCE_GROUP }}
