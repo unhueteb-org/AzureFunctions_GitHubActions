@@ -30,7 +30,7 @@
     },
     "runtime": {
       "type": "string",
-      "defaultValue": "node",
+      "defaultValue": "dotnet",
       "allowedValues": [
         "node",
         "dotnet",
