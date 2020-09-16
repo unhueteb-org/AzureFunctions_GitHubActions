@@ -130,3 +130,10 @@ jobs:
       with:
         # Specify the script here
         inlineScript: az functionapp delete --name azurechallengeunai-${{ github.head_ref }}   --resource-group ${{ env.AZURE_RESOURCE_GROUP }}
+        
+        
+    - name: Azure CLI Action
+      uses: Azure/cli@v1.0.0
+      with:
+        # Specify the script here
+        inlineScript: az monitor app-insights component delete --app azurechallengeunai-${{ github.head_ref }}   -g ${{ env.AZURE_RESOURCE_GROUP }}
