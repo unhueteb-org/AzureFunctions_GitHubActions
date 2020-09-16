@@ -129,7 +129,9 @@ jobs:
       uses: Azure/cli@v1.0.0
       with:
         # Specify the script here
-        inlineScript: az functionapp delete --name azurechallengeunai-${{ github.head_ref }}   --resource-group ${{ env.AZURE_RESOURCE_GROUP }}
+        inlineScript: |
+          az functionapp stop --name azurechallengeunai-${{ github.head_ref }}   --resource-group ${{ env.AZURE_RESOURCE_GROUP }}
+          az functionapp delete --name azurechallengeunai-${{ github.head_ref }}   --resource-group ${{ env.AZURE_RESOURCE_GROUP }}
         
         
     - name: Azure CLI Action
