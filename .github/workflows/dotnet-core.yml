@@ -87,7 +87,7 @@ jobs:
     
     runs-on: ubuntu-latest
     
-    needs: build
+    needs: deploy-arm-template
     env:
       AZURE_RESOURCE_GROUP: AzureChallengeGitHubActionsRG-rg   # set this to your Azure Resource group's name  
       AZURE_LOCATION: WestEurope  # set this to your Location Name 
