@@ -50,7 +50,7 @@ jobs:
     
     needs: build
     env:
-      AZURE_RESOURCE_GROUP: AzureChallengeGitHubActionsRG  # set this to your Azure Resource group's name  
+      AZURE_RESOURCE_GROUP: AzureChallengeGitHubActionsRG-rg  # set this to your Azure Resource group's name  
       AZURE_LOCATION: NorthEurope  # set this to your Location Name 
     
     steps:
