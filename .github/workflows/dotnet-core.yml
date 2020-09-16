@@ -103,6 +103,14 @@ jobs:
     #- name: 'Checkout GitHub Action'
      # uses: actions/checkout@master
 
+
+# Authentication
+    # Set up the following secrets in your repository: AZURE_CREDENTIALS
+    # For details on usage of secrets, please refer https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_RBAC_CREDENTIALS  }}
     
     - name: 'Run Azure Functions Action'
       uses: Azure/functions-action@v1
