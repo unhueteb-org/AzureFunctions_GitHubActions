@@ -1,18 +1,6 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "sites_GAchallengeUnai_name": {
-            "value": "GAchallengeUnai"
-        },
-        "components_GAchallengeUnai_name": {
-            "value": "GAchallengeUnai"
-        },
-        "storageAccounts_storageaccountazurea5d0_name": {
-            "value": "storageaccountazurea5d0"
-        },
-        "serverfarms_ASP_AzureChallengeGitHubActionsRG4_bb14_name": {
-            "value": "ASP-AzureChallengeGitHubActionsRG4-bb14"
-        }
-    }
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+  }
 }
