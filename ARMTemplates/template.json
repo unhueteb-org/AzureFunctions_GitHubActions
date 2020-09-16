@@ -1,0 +1,717 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "sites_GAchallengeUnai_name": {
+            "defaultValue": "GAchallengeUnai",
+            "type": "String"
+        },
+        "components_GAchallengeUnai_name": {
+            "defaultValue": "GAchallengeUnai",
+            "type": "String"
+        },
+        "storageAccounts_storageaccountazurea5d0_name": {
+            "defaultValue": "storageaccountazurea5d0",
+            "type": "String"
+        },
+        "serverfarms_ASP_AzureChallengeGitHubActionsRG4_bb14_name": {
+            "defaultValue": "ASP-AzureChallengeGitHubActionsRG4-bb14",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "microsoft.insights/components",
+            "apiVersion": "2018-05-01-preview",
+            "name": "[parameters('components_GAchallengeUnai_name')]",
+            "location": "westeurope",
+            "kind": "web",
+            "properties": {
+                "Application_Type": "web",
+                "Request_Source": "IbizaWebAppExtensionCreate",
+                "RetentionInDays": 90,
+                "publicNetworkAccessForIngestion": "Enabled",
+                "publicNetworkAccessForQuery": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[parameters('storageAccounts_storageaccountazurea5d0_name')]",
+            "location": "westeurope",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "Storage",
+            "properties": {
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "virtualNetworkRules": [],
+                    "ipRules": [],
+                    "defaultAction": "Allow"
+                },
+                "supportsHttpsTrafficOnly": true,
+                "encryption": {
+                    "services": {
+                        "file": {
+                            "keyType": "Account",
+                            "enabled": true
+                        },
+                        "blob": {
+                            "keyType": "Account",
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2018-02-01",
+            "name": "[parameters('serverfarms_ASP_AzureChallengeGitHubActionsRG4_bb14_name')]",
+            "location": "West Europe",
+            "sku": {
+                "name": "Y1",
+                "tier": "Dynamic",
+                "size": "Y1",
+                "family": "Y",
+                "capacity": 0
+            },
+            "kind": "functionapp",
+            "properties": {
+                "perSiteScaling": false,
+                "maximumElasticWorkerCount": 1,
+                "isSpot": false,
+                "reserved": false,
+                "isXenon": false,
+                "hyperV": false,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccounts_storageaccountazurea5d0_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountazurea5d0_name'))]"
+            ],
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                },
+                "deleteRetentionPolicy": {
+                    "enabled": false
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/fileServices",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccounts_storageaccountazurea5d0_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountazurea5d0_name'))]"
+            ],
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/queueServices",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccounts_storageaccountazurea5d0_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountazurea5d0_name'))]"
+            ],
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/tableServices",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccounts_storageaccountazurea5d0_name'), '/default')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountazurea5d0_name'))]"
+            ],
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2018-11-01",
+            "name": "[parameters('sites_GAchallengeUnai_name')]",
+            "location": "West Europe",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_AzureChallengeGitHubActionsRG4_bb14_name'))]"
+            ],
+            "kind": "functionapp",
+            "properties": {
+                "enabled": true,
+                "hostNameSslStates": [
+                    {
+                        "name": "gachallengeunai.azurewebsites.net",
+                        "sslState": "Disabled",
+                        "hostType": "Standard"
+                    },
+                    {
+                        "name": "gachallengeunai.scm.azurewebsites.net",
+                        "sslState": "Disabled",
+                        "hostType": "Repository"
+                    }
+                ],
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverfarms_ASP_AzureChallengeGitHubActionsRG4_bb14_name'))]",
+                "reserved": false,
+                "isXenon": false,
+                "hyperV": false,
+                "siteConfig": {},
+                "scmSiteAlsoStopped": false,
+                "clientAffinityEnabled": true,
+                "clientCertEnabled": false,
+                "hostNamesDisabled": false,
+                "containerSize": 1536,
+                "dailyMemoryTimeQuota": 0,
+                "httpsOnly": false,
+                "redundancyMode": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_GAchallengeUnai_name'), '/web')]",
+            "location": "West Europe",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_GAchallengeUnai_name'))]"
+            ],
+            "properties": {
+                "numberOfWorkers": -1,
+                "defaultDocuments": [
+                    "Default.htm",
+                    "Default.html",
+                    "Default.asp",
+                    "index.htm",
+                    "index.html",
+                    "iisstart.htm",
+                    "default.aspx",
+                    "index.php"
+                ],
+                "netFrameworkVersion": "v4.0",
+                "phpVersion": "5.6",
+                "requestTracingEnabled": false,
+                "remoteDebuggingEnabled": false,
+                "httpLoggingEnabled": false,
+                "logsDirectorySizeLimit": 35,
+                "detailedErrorLoggingEnabled": false,
+                "publishingUsername": "$GAchallengeUnai",
+                "azureStorageAccounts": {},
+                "scmType": "None",
+                "use32BitWorkerProcess": true,
+                "webSocketsEnabled": false,
+                "alwaysOn": false,
+                "managedPipelineMode": "Integrated",
+                "virtualApplications": [
+                    {
+                        "virtualPath": "/",
+                        "physicalPath": "site\\wwwroot",
+                        "preloadEnabled": false
+                    }
+                ],
+                "loadBalancing": "LeastRequests",
+                "experiments": {
+                    "rampUpRules": []
+                },
+                "autoHealEnabled": false,
+                "cors": {
+                    "allowedOrigins": [
+                        "https://functions.azure.com",
+                        "https://functions-staging.azure.com",
+                        "https://functions-next.azure.com"
+                    ],
+                    "supportCredentials": false
+                },
+                "localMySqlEnabled": false,
+                "ipSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 1,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictions": [
+                    {
+                        "ipAddress": "Any",
+                        "action": "Allow",
+                        "priority": 1,
+                        "name": "Allow all",
+                        "description": "Allow all access"
+                    }
+                ],
+                "scmIpSecurityRestrictionsUseMain": false,
+                "http20Enabled": false,
+                "minTlsVersion": "1.2",
+                "ftpsState": "AllAllowed",
+                "reservedInstanceCount": 0
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/deployments",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_GAchallengeUnai_name'), '/8855ff3f2aa5411cb78970096a73eb02')]",
+            "location": "West Europe",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_GAchallengeUnai_name'))]"
+            ],
+            "properties": {
+                "status": 4,
+                "author_email": "N/A",
+                "author": "N/A",
+                "deployer": "GITHUB_ZIP_DEPLOY",
+                "message": "Created via a push deployment",
+                "start_time": "2020-09-16T08:26:54.0656391Z",
+                "end_time": "2020-09-16T08:27:26.6184714Z",
+                "active": false
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/deployments",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_GAchallengeUnai_name'), '/9215befe1222dfd09fd47bdcd9a7bbb1a7380d5c1600244851549')]",
+            "location": "West Europe",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_GAchallengeUnai_name'))]"
+            ],
+            "properties": {
+                "status": 4,
+                "author": "unaihuete93",
+                "deployer": "GitHub",
+                "message": "{\"type\":\"Deployment\",\"sha\":\"9215befe1222dfd09fd47bdcd9a7bbb1a7380d5c\",\"repoName\":\"unhueteb-org/AzureFunctions_GitHubActions\",\"slotName\":\"production\"}",
+                "start_time": "2020-09-16T08:27:32.1163849Z",
+                "end_time": "2020-09-16T08:27:32.1163849Z",
+                "active": true
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/functions",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_GAchallengeUnai_name'), '/InventoryAddItemStockPut')]",
+            "location": "West Europe",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_GAchallengeUnai_name'))]"
+            ],
+            "properties": {
+                "script_root_path_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/InventoryAddItemStockPut/",
+                "script_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/bin/ECommerce.dll",
+                "config_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/InventoryAddItemStockPut/function.json",
+                "href": "https://gachallengeunai.azurewebsites.net/admin/functions/InventoryAddItemStockPut",
+                "config": {}
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/functions",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_GAchallengeUnai_name'), '/InventoryCreateItemPost')]",
+            "location": "West Europe",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_GAchallengeUnai_name'))]"
+            ],
+            "properties": {
+                "script_root_path_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/InventoryCreateItemPost/",
+                "script_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/bin/ECommerce.dll",
+                "config_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/InventoryCreateItemPost/function.json",
+                "href": "https://gachallengeunai.azurewebsites.net/admin/functions/InventoryCreateItemPost",
+                "config": {}
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/functions",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_GAchallengeUnai_name'), '/InventoryEntity')]",
+            "location": "West Europe",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_GAchallengeUnai_name'))]"
+            ],
+            "properties": {
+                "script_root_path_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/InventoryEntity/",
+                "script_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/bin/ECommerce.dll",
+                "config_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/InventoryEntity/function.json",
+                "href": "https://gachallengeunai.azurewebsites.net/admin/functions/InventoryEntity",
+                "config": {}
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/functions",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_GAchallengeUnai_name'), '/OrderCheckoutPost')]",
+            "location": "West Europe",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_GAchallengeUnai_name'))]"
+            ],
+            "properties": {
+                "script_root_path_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/OrderCheckoutPost/",
+                "script_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/bin/ECommerce.dll",
+                "config_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/OrderCheckoutPost/function.json",
+                "href": "https://gachallengeunai.azurewebsites.net/admin/functions/OrderCheckoutPost",
+                "config": {}
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/functions",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_GAchallengeUnai_name'), '/OrderEntity')]",
+            "location": "West Europe",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_GAchallengeUnai_name'))]"
+            ],
+            "properties": {
+                "script_root_path_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/OrderEntity/",
+                "script_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/bin/ECommerce.dll",
+                "config_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/OrderEntity/function.json",
+                "href": "https://gachallengeunai.azurewebsites.net/admin/functions/OrderEntity",
+                "config": {}
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/functions",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_GAchallengeUnai_name'), '/OrderGet')]",
+            "location": "West Europe",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_GAchallengeUnai_name'))]"
+            ],
+            "properties": {
+                "script_root_path_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/OrderGet/",
+                "script_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/bin/ECommerce.dll",
+                "config_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/OrderGet/function.json",
+                "href": "https://gachallengeunai.azurewebsites.net/admin/functions/OrderGet",
+                "config": {}
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/functions",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_GAchallengeUnai_name'), '/OrderOrchestrator')]",
+            "location": "West Europe",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_GAchallengeUnai_name'))]"
+            ],
+            "properties": {
+                "script_root_path_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/OrderOrchestrator/",
+                "script_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/bin/ECommerce.dll",
+                "config_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/OrderOrchestrator/function.json",
+                "href": "https://gachallengeunai.azurewebsites.net/admin/functions/OrderOrchestrator",
+                "config": {}
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/functions",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_GAchallengeUnai_name'), '/ShoppingCartDelete')]",
+            "location": "West Europe",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_GAchallengeUnai_name'))]"
+            ],
+            "properties": {
+                "script_root_path_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/ShoppingCartDelete/",
+                "script_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/bin/ECommerce.dll",
+                "config_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/ShoppingCartDelete/function.json",
+                "href": "https://gachallengeunai.azurewebsites.net/admin/functions/ShoppingCartDelete",
+                "config": {}
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/functions",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_GAchallengeUnai_name'), '/ShoppingCartEntity')]",
+            "location": "West Europe",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_GAchallengeUnai_name'))]"
+            ],
+            "properties": {
+                "script_root_path_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/ShoppingCartEntity/",
+                "script_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/bin/ECommerce.dll",
+                "config_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/ShoppingCartEntity/function.json",
+                "href": "https://gachallengeunai.azurewebsites.net/admin/functions/ShoppingCartEntity",
+                "config": {}
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/functions",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_GAchallengeUnai_name'), '/ShoppingCartGet')]",
+            "location": "West Europe",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_GAchallengeUnai_name'))]"
+            ],
+            "properties": {
+                "script_root_path_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/ShoppingCartGet/",
+                "script_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/bin/ECommerce.dll",
+                "config_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/ShoppingCartGet/function.json",
+                "href": "https://gachallengeunai.azurewebsites.net/admin/functions/ShoppingCartGet",
+                "config": {}
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/functions",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_GAchallengeUnai_name'), '/ShoppingCartOrchestrator')]",
+            "location": "West Europe",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_GAchallengeUnai_name'))]"
+            ],
+            "properties": {
+                "script_root_path_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/ShoppingCartOrchestrator/",
+                "script_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/bin/ECommerce.dll",
+                "config_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/ShoppingCartOrchestrator/function.json",
+                "href": "https://gachallengeunai.azurewebsites.net/admin/functions/ShoppingCartOrchestrator",
+                "config": {}
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/functions",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_GAchallengeUnai_name'), '/ShoppingCartPost')]",
+            "location": "West Europe",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_GAchallengeUnai_name'))]"
+            ],
+            "properties": {
+                "script_root_path_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/ShoppingCartPost/",
+                "script_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/bin/ECommerce.dll",
+                "config_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/ShoppingCartPost/function.json",
+                "href": "https://gachallengeunai.azurewebsites.net/admin/functions/ShoppingCartPost",
+                "config": {}
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/functions",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_GAchallengeUnai_name'), '/ShoppingCartReset')]",
+            "location": "West Europe",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_GAchallengeUnai_name'))]"
+            ],
+            "properties": {
+                "script_root_path_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/ShoppingCartReset/",
+                "script_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/bin/ECommerce.dll",
+                "config_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/ShoppingCartReset/function.json",
+                "href": "https://gachallengeunai.azurewebsites.net/admin/functions/ShoppingCartReset",
+                "config": {}
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/functions",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_GAchallengeUnai_name'), '/StoreGet')]",
+            "location": "West Europe",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_GAchallengeUnai_name'))]"
+            ],
+            "properties": {
+                "script_root_path_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/StoreGet/",
+                "script_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/bin/ECommerce.dll",
+                "config_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/StoreGet/function.json",
+                "href": "https://gachallengeunai.azurewebsites.net/admin/functions/StoreGet",
+                "config": {}
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/functions",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_GAchallengeUnai_name'), '/StoreReset')]",
+            "location": "West Europe",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_GAchallengeUnai_name'))]"
+            ],
+            "properties": {
+                "script_root_path_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/StoreReset/",
+                "script_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/bin/ECommerce.dll",
+                "config_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/StoreReset/function.json",
+                "href": "https://gachallengeunai.azurewebsites.net/admin/functions/StoreReset",
+                "config": {}
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/functions",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_GAchallengeUnai_name'), '/StoreValidateProducts')]",
+            "location": "West Europe",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_GAchallengeUnai_name'))]"
+            ],
+            "properties": {
+                "script_root_path_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/StoreValidateProducts/",
+                "script_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/bin/ECommerce.dll",
+                "config_href": "https://gachallengeunai.azurewebsites.net/admin/vfs/site/wwwroot/StoreValidateProducts/function.json",
+                "href": "https://gachallengeunai.azurewebsites.net/admin/functions/StoreValidateProducts",
+                "config": {}
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/hostNameBindings",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('sites_GAchallengeUnai_name'), '/', parameters('sites_GAchallengeUnai_name'), '.azurewebsites.net')]",
+            "location": "West Europe",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('sites_GAchallengeUnai_name'))]"
+            ],
+            "properties": {
+                "siteName": "GAchallengeUnai",
+                "hostNameType": "Verified"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccounts_storageaccountazurea5d0_name'), '/default/azure-webjobs-hosts')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_storageaccountazurea5d0_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountazurea5d0_name'))]"
+            ],
+            "properties": {
+                "defaultEncryptionScope": "$account-encryption-key",
+                "denyEncryptionScopeOverride": false,
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccounts_storageaccountazurea5d0_name'), '/default/azure-webjobs-secrets')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_storageaccountazurea5d0_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountazurea5d0_name'))]"
+            ],
+            "properties": {
+                "defaultEncryptionScope": "$account-encryption-key",
+                "denyEncryptionScopeOverride": false,
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccounts_storageaccountazurea5d0_name'), '/default/gachallengeunai-leases')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', parameters('storageAccounts_storageaccountazurea5d0_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountazurea5d0_name'))]"
+            ],
+            "properties": {
+                "defaultEncryptionScope": "$account-encryption-key",
+                "denyEncryptionScopeOverride": false,
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccounts_storageaccountazurea5d0_name'), '/default/gachallengeunaiba40')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/fileServices', parameters('storageAccounts_storageaccountazurea5d0_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountazurea5d0_name'))]"
+            ],
+            "properties": {
+                "accessTier": "TransactionOptimized",
+                "shareQuota": 5120,
+                "enabledProtocols": "SMB"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/queueServices/queues",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccounts_storageaccountazurea5d0_name'), '/default/gachallengeunai-control-00')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/queueServices', parameters('storageAccounts_storageaccountazurea5d0_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountazurea5d0_name'))]"
+            ],
+            "properties": {
+                "metadata": {}
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/queueServices/queues",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccounts_storageaccountazurea5d0_name'), '/default/gachallengeunai-control-01')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/queueServices', parameters('storageAccounts_storageaccountazurea5d0_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountazurea5d0_name'))]"
+            ],
+            "properties": {
+                "metadata": {}
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/queueServices/queues",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccounts_storageaccountazurea5d0_name'), '/default/gachallengeunai-control-02')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/queueServices', parameters('storageAccounts_storageaccountazurea5d0_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountazurea5d0_name'))]"
+            ],
+            "properties": {
+                "metadata": {}
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/queueServices/queues",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccounts_storageaccountazurea5d0_name'), '/default/gachallengeunai-control-03')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/queueServices', parameters('storageAccounts_storageaccountazurea5d0_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountazurea5d0_name'))]"
+            ],
+            "properties": {
+                "metadata": {}
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/queueServices/queues",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccounts_storageaccountazurea5d0_name'), '/default/gachallengeunai-workitems')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/queueServices', parameters('storageAccounts_storageaccountazurea5d0_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountazurea5d0_name'))]"
+            ],
+            "properties": {
+                "metadata": {}
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/tableServices/tables",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccounts_storageaccountazurea5d0_name'), '/default/GAchallengeUnaiHistory')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/tableServices', parameters('storageAccounts_storageaccountazurea5d0_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountazurea5d0_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/tableServices/tables",
+            "apiVersion": "2019-06-01",
+            "name": "[concat(parameters('storageAccounts_storageaccountazurea5d0_name'), '/default/GAchallengeUnaiInstances')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/tableServices', parameters('storageAccounts_storageaccountazurea5d0_name'), 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_storageaccountazurea5d0_name'))]"
+            ]
+        }
+    ]
+}
