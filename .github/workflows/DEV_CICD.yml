@@ -49,15 +49,7 @@ jobs:
       AZURE_RESOURCE_GROUP: AzureChallengeGitHubActionsRG-rg  # set this to your Azure Resource group's name  
       AZURE_LOCATION: NorthEurope  # set this to your Location Name 
     
-    steps:
-      
-      - name: Step that prints name of pull request's base branch
-        run: |
-          echo "Pull request's base branch is: ${BASE_BRANCH}"
-        env:
-          BASE_BRANCH: ${{ github.base_ref }}
-        if: github.event_name == 'pull_request'
-        
+    steps:    
        
         
           #Download ARM template artifatcts
@@ -84,7 +76,7 @@ jobs:
           # For details on usage of environment variables, please refer https://help.github.com/en/actions/configuring-and-managing-workflows/using-environment-variables
           # or specify these parameters inline.  Example:  az group create -l westus -n MyResourceGroup
 
-            az deployment group create --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --template-file $GITHUB_WORKSPACE/template.json  --parameters $GITHUB_WORKSPACE/parameters.json --parameters appName=azurechallengeunai-${{ github.head_ref }}  --mode incremental 
+            az deployment group create --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --template-file $GITHUB_WORKSPACE/template.json  --parameters $GITHUB_WORKSPACE/parameters.json --parameters appName=azurechallengeunai-test-fa  --mode incremental 
 
          # For more details on above command refer https://docs.microsoft.com/en-us/cli/azure/group/deployment?view=azure-cli-latest#az-group-deployment-create       
 
@@ -122,22 +114,7 @@ jobs:
       uses: Azure/functions-action@v1
       id: fa
       with:
-        app-name: azurechallengeunai-${{ github.head_ref }}                                                           
+        app-name: azurechallengeunai-test-fa                                                           
         package: $GITHUB_WORKSPACE/Function
         
-    - name: Azure CLI Action
-      uses: Azure/cli@v1.0.0
-      with:
-        # Specify the script here
-        inlineScript: |
-          az functionapp stop --name azurechallengeunai-${{ github.head_ref }}   --resource-group ${{ env.AZURE_RESOURCE_GROUP }}
-          az functionapp delete --name azurechallengeunai-${{ github.head_ref }}   --resource-group ${{ env.AZURE_RESOURCE_GROUP }}
-        
-        
-    - name: Azure CLI Action
-      uses: Azure/cli@v1.0.0
-      with:
-        # Specify the script here
-        inlineScript: |
-          az extension add --name application-insights
-          az monitor app-insights component delete --app azurechallengeunai-${{ github.head_ref }}   -g ${{ env.AZURE_RESOURCE_GROUP }}
+   
