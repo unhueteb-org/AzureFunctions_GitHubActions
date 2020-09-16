@@ -38,6 +38,51 @@ jobs:
       with:
         name: Function
         path: ${{env.DOTNET_ROOT}}/myapp
+        
+     #Publish webapp artifacts
+    - name: Upload ARM Templates Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: ARM_Templates
+        path: ${{ github.workspace }}/ARMTemplates   
+  
+  deploy-arm-template:
+    runs-on: ubuntu-latest
+    
+    needs: build
+    env:
+      AZURE_RESOURCE_GROUP: AzureChallengeGitHubActionsRG  # set this to your Azure Resource group's name  
+      AZURE_LOCATION: NorthEurope  # set this to your Location Name 
+    
+    steps:
+          #Download ARM template artifatcts
+      - uses: actions/download-artifact@v2
+        with:
+          name: ARM_Templates
+
+      # Authentication
+      # Set up the following secrets in your repository: AZURE_CREDENTIALS
+      # For details on usage of secrets, please refer https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS  }}
+
+
+      # Deployment of template    
+      - name: Deploy ARM Template
+        uses: azure/CLI@v1
+        with:
+          azcliversion: latest
+          inlineScript: 
+          # You can change these environment variables for your configuration:   AZURE_RESOURCE_GROUP, AZURE_LOCATION 
+          # For details on usage of environment variables, please refer https://help.github.com/en/actions/configuring-and-managing-workflows/using-environment-variables
+          # or specify these parameters inline.  Example:  az group create -l westus -n MyResourceGroup
+
+            az deployment group create --resource-group ${{ env.AZURE_RESOURCE_GROUP }} --template-file $GITHUB_WORKSPACE/template.json  --parameters $GITHUB_WORKSPACE/parameters.json  --mode incremental 
+
+         # For more details on above command refer https://docs.microsoft.com/en-us/cli/azure/group/deployment?view=azure-cli-latest#az-group-deployment-create       
+
   
   publish-azure-function:
     
@@ -45,7 +90,7 @@ jobs:
     
     needs: build
     env:
-      AZURE_RESOURCE_GROUP: AzureChallengeGitHubActionsRG-4   # set this to your Azure Resource group's name  
+      AZURE_RESOURCE_GROUP: AzureChallengeGitHubActionsRG-rg   # set this to your Azure Resource group's name  
       AZURE_LOCATION: WestEurope  # set this to your Location Name 
     
     steps:
