@@ -1,7 +1,8 @@
-name: master branch CICD - PRoduction Function APP
+name: master branch CICD - Production Function APP
 on:
   push:
     branches: [ master ]
+    
  
 
 jobs:
